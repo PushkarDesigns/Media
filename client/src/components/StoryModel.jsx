@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ArrowLeft, Sparkle, TextIcon, Upload, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const StoryModel = ({ setShowModal, fetchStories }) => {
   const bgColors = ["#4f46e5", "#7c3aed", "#db2777", "#e11d48", "#ca8a04", "#0d9488"];
@@ -97,7 +98,7 @@ const StoryModel = ({ setShowModal, fetchStories }) => {
             </label>
 
           </div>
-          <button className='flex items-center justify-center gap-2 text-white py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition cursor-pointer'>
+          <button onClick={()=> toast.promise(handleCreateStory(),{loading: 'Saying...', success: <p>Story Added</p>, error: e=> <p>{e.massage}</p>,})} className='flex items-center justify-center gap-2 text-white py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition cursor-pointer'>
             <Sparkle size={18}/> Create Story
           </button>
 
