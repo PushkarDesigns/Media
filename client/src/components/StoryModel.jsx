@@ -37,7 +37,7 @@ const StoryModel = ({ setShowModal, fetchStories }) => {
             </button>
 
             {/* Close Button (Inferred from justify-between) */}
-            <button onClick={() => { }} className='text-white p-2 cursor-pointer hover:bg-white/10 rounded-full transition-colors'>
+            <button onClick={() => { setShowModal(false) }} className='text-white p-2 cursor-pointer hover:bg-white/10 rounded-full transition-colors'>
               <X size={24} />
             </button>
             <h2 className='text-lg font-semibold'>Create Story</h2>
@@ -98,7 +98,7 @@ const StoryModel = ({ setShowModal, fetchStories }) => {
             </label>
 
           </div>
-          <button onClick={()=> toast.promise(handleCreateStory(),{loading: 'Saying...', success: <p>Story Added</p>, error: e=> <p>{e.massage}</p>,})} className='flex items-center justify-center gap-2 text-white py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition cursor-pointer'>
+          <button onClick={()=> toast.promise(handleCreateStory(),{loading: 'Saying...', success: <p>Story Added</p>, error: e=> <p>{e.message}</p>,})} className='flex items-center justify-center gap-2 text-white py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition cursor-pointer'>
             <Sparkle size={18}/> Create Story
           </button>
 

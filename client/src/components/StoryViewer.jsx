@@ -79,9 +79,9 @@ const StoryViewer = ({ viewStory, setViewStory }) => {
             </button>
             {/* Content Wrapper */}
             <div className='max-w-[90vw] max-h-[90vh] flex items-center justify-center'>
-                <p className='text-white text-center text-xl sm:text-3xl font-bold px-4'>
+                <div className='text-white text-center text-xl sm:text-3xl font-bold px-4'>
                     {renderContent()}
-                </p>
+                </div>
             </div>
         </div>
     )
