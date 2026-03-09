@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { dummyPostsData } from '../assets/assets'
 import Loading from '../components/Loading.jsx';
 import StoriesBar from '../components/StoriesBar.jsx';
+import PostCard from '../components/PostCard.jsx';
 
 const Feed = () => {
 
@@ -10,7 +11,7 @@ const Feed = () => {
 
   const fetchFeeds = async () => {
     setfeeds(dummyPostsData);
-    setLoading(false)    
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -19,23 +20,25 @@ const Feed = () => {
 
   return !loading ? (
     <>
-    <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">
-      {/* stories and post list */}
-      <div className="">
-        <StoriesBar />
-        <div className="p-4 space-y-6">
-          List of post
-        </div>
-      </div>
-
-      {/* right sidebar */}
-      <div className="">
+      <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">
+        {/* stories and post list */}
         <div className="">
-          <h1 className="">Sponsored</h1>
+          <StoriesBar />
+          <div className="p-4 space-y-6">
+            {feeds.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
+          </div>
         </div>
-        <h1 className="">Recent messages</h1>
+
+        {/* right sidebar */}
+        <div className="">
+          <div className="">
+            <h1 className="">Sponsored</h1>
+          </div>
+          <h1 className="">Recent messages</h1>
+        </div>
       </div>
-    </div>
     </>
   ) : <Loading />
 }
