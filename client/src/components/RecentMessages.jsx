@@ -22,7 +22,7 @@ const RecentMessages = () => {
                 <div className='flex flex-col max-h-56 overflow-y-scroll no-scrollbar'>
                     {
                         messages.map((message, index) => (
-                            <Link key={index} to={`/messages/${message.id}`} className='flex items-start gap-2 py-2 hover:bg-slate-100 rounded-md transition-all px-2'>
+                            <Link key={index} to={`/messages/${message.from_user_id._id}`} className='flex items-start gap-2 py-2 hover:bg-slate-100 rounded-md transition-all px-2'>
                                 {/* User Profile Image */}
                                 <img src={message.from_user_id.profile_picture} alt="" className='w-8 h-8 rounded-full object-cover' />
 
@@ -31,8 +31,19 @@ const RecentMessages = () => {
                                         {/* User Name */}
                                         <p className='font-semibold text-slate-900'>{message.from_user_id.full_name}</p>
                                         {/* Message Preview */}
-                                        <p className='text-slate-400 line-clamp-1'>{moment(message.createdAt).fromNow()}</p>
+                                        <p className='text-[10px] text-slate-400 line-clamp-1'>{moment(message.createdAt).fromNow()}</p>
                                     </div>
+                                    <div className='flex justify-between'>
+                                        <p className='text-gray-500'>
+                                            {message.text ? message.text : 'Media'}
+                                        </p>
+                                        {!message.seen && (
+                                            <p className='bg-indigo-500 text-white w-4 h-4 flex items-center justify-center rounded-full text-[10px]'>
+                                                1
+                                            </p>
+                                        )}
+                                    </div>
+
                                 </div>
 
                             </Link>
