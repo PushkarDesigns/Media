@@ -78,4 +78,4 @@ export const functions = [
     syncUserCreation,
     syncUserUpdation,
     syncUserDeletion
-]
+];
