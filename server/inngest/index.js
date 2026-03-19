@@ -15,25 +15,25 @@ const syncUserCreation = inngest.createFunction(
     let username = email_addresses[0].email_address.split('@')[0];
 
     // Check availability of username
-    const userExists = await User.findOne({ username });
+    const user = await User.findOne({ username });
 
-    if (userExists) {
+    if (user) {
       // Append random numbers if username is taken
       username = username + Math.floor(Math.random() * 10000);
     }
 
     // Save the new user to MongoDB
-    const newUser = new User({
+    const userData = {
       _id: id,
       email: email_addresses[0].email_address,
-      full_name: `${first_name} ${last_name}`,
+      full_name: first_name + " " + last_name,
       username: username,
       profile_picture: image_url,
-    });
+    };
 
-    await newUser.save();
+    await User.create(userData);
     
-    return { message: "User synced successfully", userId: id };
+    // return { message: "User synced successfully", userId: id };
   }
 );
 
@@ -53,13 +53,13 @@ const syncUserUpdation = inngest.createFunction(
         // Update the user record where _id matches Clerk's id
         await User.findByIdAndUpdate(id, updatedUserData);
 
-        return { message: "User updated successfully", userId: id };
+        // return { message: "User updated successfully", userId: id };
     }
 );
 
 // Inngest Function to delete user data from the database
-export const syncUserDelete = inngest.createFunction(
-    { id: 'delete-user-from-clerk' },
+export const syncUserDeletion = inngest.createFunction(
+    { id: 'delete-user-with-clerk' },
     { event: 'clerk/user.deleted' },
     async ({ event }) => {
         const { id } = event.data;
@@ -67,7 +67,7 @@ export const syncUserDelete = inngest.createFunction(
         // Permanently remove the user from MongoDB
         await User.findByIdAndDelete(id);
 
-        return { message: "User deleted successfully", userId: id };
+        // return { message: "User deleted successfully", userId: id };
     }
 );
 
@@ -76,5 +76,5 @@ export const syncUserDelete = inngest.createFunction(
 export const functions = [
     syncUserCreation,
     syncUserUpdation,
-    syncUserDelete
+    syncUserDeletion
 ]
