@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import connectDB from './configs/db.js';
-import { inngest,functions } from './inngest/index.js'
+import { inngest, functions } from './inngest/index.js'
 import { serve } from 'inngest/express'
 
 const app = express();
@@ -14,10 +14,8 @@ app.use(cors());
 
 app.get('/', (req, res) => res.send('Server is running'));
 // The route from your image
-app.use("/api/inngest", serve({ 
-  client: inngest, 
-  functions: functions 
-}));
+app.use("/api/inngest", serve({ client: inngest, functions }));
+console.log("Functions loaded:", functions);
 
 const PORT = process.env.PORT || 4000;
 
