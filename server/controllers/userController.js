@@ -54,7 +54,7 @@ export const updateUserData = async (req, res) => {
         fileName: profile.originalname,
       });
 
-      const url = imagekit.url({
+      const url = imageKit.url({
         path: response.filePath,
         transformation: [
           { quality: 'auto' },
