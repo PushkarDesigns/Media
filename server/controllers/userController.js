@@ -62,11 +62,34 @@ export const updateUserData = async (req, res) => {
           { width: '512' }
         ]
       });
+      updateUserData.profile_picture = url;
     }
 
+    if (cover) {
+      const buffer = fs.readFileSync(cover.path);
+      const response = await imageKit.upload({
+        file: buffer,
+        fileName: profile.originalname,
+      });
+
+      const url = imageKit.url({
+        path: response.filePath,
+        transformation: [
+          { quality: 'auto' },
+          { format: 'webp' },
+          { width: '1280' }
+        ]
+      });
+      updateUserData.cover_photo = url;
+    }
+    const user = await User.findByIdAndUpdate(userId, updatedData, { new: true })
+
+    res.json({ success: true, user, message: 'Profile updated successfully' })
 
   } catch (error) {
     console.log(error)
     res.json({ success: false, message: error.message })
   }
 }
+
+// find users using username,email, location, name
