@@ -5,6 +5,7 @@ import connectDB from './configs/db.js';
 import { inngest, functions } from './inngest/index.js'
 import { serve } from 'inngest/express'
 import { clerkMiddleware } from '@clerk/express'
+import userRouter from './routes/userRoutes.js';
 
 const app = express();
 
@@ -18,7 +19,8 @@ app.use(clerkMiddleware());
 app.get('/', (req, res) => res.send('Server is running'));
 // The route from your image
 app.use("/api/inngest", serve({ client: inngest, functions }));
-console.log("Functions loaded:", functions);
+// console.log("Functions loaded:", functions);
+app.use('/api/user', userRouter)
 
 const PORT = process.env.PORT || 4000;
 
