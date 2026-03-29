@@ -4,9 +4,11 @@ import Loading from '../components/Loading.jsx';
 import StoriesBar from '../components/StoriesBar.jsx';
 import PostCard from '../components/PostCard.jsx';
 import RecentMessages from '../components/RecentMessages.jsx';
+// import { useAuth } from "@clerk/clerk-react";
 
 const Feed = () => {
 
+  // const { getToken } = useAuth();
   const [feeds, setfeeds] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,6 +16,31 @@ const Feed = () => {
     setfeeds(dummyPostsData);
     setLoading(false)
   }
+  // const fetchFeeds = async () => {
+  //   try {
+  //     const token = await getToken();
+
+  //     const res = await fetch(
+  //       "http://localhost:4000/api/user/feeds",
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       }
+  //     );
+
+  //     const data = await res.json();
+
+  //     if (data.success) {
+  //       setfeeds(data.posts);
+  //     }
+
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     fetchFeeds()
@@ -38,7 +65,7 @@ const Feed = () => {
             <h3 className='text-slate-800 font-semibold'>Sponsored</h3>
 
             <img src={assets.sponsored_img} className='w-75 h-50 rounded-md'
-              alt=""/>
+              alt="" />
 
             <p className='text-slate-600'>Email marketing</p>
 

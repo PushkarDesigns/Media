@@ -2,9 +2,11 @@ import React, { useState } from 'react'
 import { dummyUserData } from '../assets/assets'
 import { Image, X } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAuth } from "@clerk/clerk-react";
 
 const CreatePost = () => {
 
+  const { getToken } = useAuth();
   const [content, setContent] = useState('')
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -12,8 +14,38 @@ const CreatePost = () => {
   const user = dummyUserData;
 
   const handleSubmit = async () => {
+    try {
+      setLoading(true);
 
-  } 
+      const token = await getToken();
+
+      const res = await fetch(
+        "http://localhost:4000/api/user/create-post",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            content
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setContent('');
+        setImages([]);
+      }
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -75,7 +107,7 @@ const CreatePost = () => {
                 }}
               />
 
-              <button className='text-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition text-white font-medium px-8 py-2 rounded-md cursor-pointer' disabled={loading} onClick={()=> toast.promise(handleSubmit(),{
+              <button className='text-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition text-white font-medium px-8 py-2 rounded-md cursor-pointer' disabled={loading} onClick={() => toast.promise(handleSubmit(), {
                 loading: 'uplaoding ...',
                 success: <p>Post Added</p>,
                 error: <p>Post Not Added</p>,

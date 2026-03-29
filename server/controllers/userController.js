@@ -1,17 +1,16 @@
 import User from "../models/User.js"
 import fs from 'fs'
 import imageKit from '../configs/imageKit.js'
+import Connection from "../models/connection.js"
 
 // Get User Data using userId
 export const getUserData = async (req, res) => {
   try {
     const { userId } = req.auth()
     const user = await User.findById(userId)
-
     if (!user) {
       return res.json({ success: false, message: "User not found" })
     }
-
     res.json({ success: true, user })
   } catch (error) {
     console.log(error)
@@ -93,7 +92,6 @@ export const updateUserData = async (req, res) => {
 }
 
 // find users using username,email, location, name
-
 export const discoverUsers = async (req, res) => {
   try {
     const { userId } = req.auth()
@@ -159,13 +157,119 @@ export const unfollowUser = async (req, res) => {
     await user.save()
 
     const toUser = await User.findById(userId)
-    user.followers = toUser.followers.filter(user => user !== userId);
+    toUser.followers = toUser.followers.filter(user => user !== userId);
     await toUser.save()
-    
-    res.json({success: true, message: 'Your are no longer following this user'})
+
+    res.json({ success: true, message: 'Your are no longer following this user' })
 
   } catch (error) {
     console.log(error);
-    res.json({success: false, message: error.message})
+    res.json({ success: false, message: error.message })
   }
 }
+
+// send connection request
+export const sendConnectionRequest = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { id } = req.body;
+
+    // 1. Rate Limit Check: Max 20 requests per 24 hours
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const connectionRequests = await Connection.find({
+      from_user_id: userId,
+      createdAt: { $gt: last24Hours } // Use 'createdAt' based on timestamps: true
+    });
+
+    if (connectionRequests >= 20) {
+      return res.status(429).json({ success: false, message: "You have sent mmore than 20 connection requests in the last 24 hours" });
+    }
+
+    // check if the users are already connected
+    const connection = await Connection.findOne({
+      $or: [
+        { from_user_id: userId, to_user_id: id },
+        { from_user_id: id, to_user_id: userId }
+      ]
+    });
+
+    // 3. Create the Connection Request
+    if (!connection) {
+      await Connection.create({
+        from_user_id: userId,
+        to_user_id: id,
+      })
+      return res.status(429).json({ success: true, message: "Connection request sent successfully" });
+    } else if (connection && connection.status === 'accepted') {
+      return res.status(429).json({ success: false, message: "You are already connected with this user" });
+    }
+    return res.status(429).json({ success: false, message: "connection request pending" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+// get user connection
+export const getUserConnection = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    // 1. Fetch user and populate their network arrays
+    const user = await User.findById(userId).populate('connections followers following');
+
+    const connections = user.connections;
+    const followers = user.followers;
+    const following = user.following;
+
+    // 2. Fetch all pending connection requests sent TO this user
+    // We populate 'from_user_id' to get the actual user details for the requester
+    const pendingConnections = (await Connection.find({
+      to_user_id: userId, status: 'pending'
+    }).populate('from_user_id')).map(connection => connection.from_user_id);
+
+    // 3. Return the consolidated network data
+    res.json({ success: true, connections, followers, following, pendingConnections });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// accept connection request
+export const acceptConnectionRequest = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { id } = req.body; // The ID of the user who sent the request
+
+    // 1. Verify the connection request exists and was sent TO the current user
+    const connection = await Connection.findOne({ from_user_id: id, to_user_id: userId, status: 'pending' });
+
+    if (!connection) {
+      return res.status(404).json({ success: false, message: 'Connection request not found' });
+    }
+
+    // 2. Add each user to the other's connection list
+    const user = await User.findById(userId);
+    user.connections.push(id);
+    await user.save();
+
+    const toUser = await User.findById(id);
+    toUser.connections.push(userId);
+    await toUser.save();
+
+    // 3. Finalize the request: Either update the status or delete the record
+    // Option A: Keep history
+    connection.status = 'accepted';
+    await connection.save();
+
+    // Option B: Delete the request record (uncomment if you prefer a clean DB)
+    // await Connection.findByIdAndDelete(connection._id);
+
+    res.status(200).json({ success: true, message: "Connection accepted successfully!" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
