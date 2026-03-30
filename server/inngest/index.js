@@ -89,7 +89,7 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
 
     await step.run('send-connection-request-mail', async () => {
       const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id');
-      
+
       const subject = `👋 New Connection Request`;
       const body = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -98,17 +98,45 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
           <p>Click <a href="${process.env.FRONTEND_URL}/connections" style="color: #10b981;">here</a> to accept or reject the request</p>
           <br/>
           <p>Thanks,<br/>PingUp - Stay Connected</p>
-        </div>
-      `;
+        </div>`;
 
       // Add your email sending logic here (e.g., using the sendEmail function from before)
-      await sendEmail({ 
-        to: connection.to_user_id.email, 
-        subject, 
-        body 
+      await sendEmail({
+        to: connection.to_user_id.email,
+        subject,
+        body
       });
     })
-    
+    const in24Hours = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await step.sleepUntil("wait-for-24-hours", in24Hours);
+
+    await step.run('send-connection-request-reminder', async () => {
+      const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id');
+
+      if (connection.status === "accepted") {
+        return { message: "Already accepted" };
+      }
+
+      const subject = `👋 New Connection Request`;
+      const body = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Hi ${connection.to_user_id.full_name},</h2>
+          <p>You have a new connection request from ${connection.from_user_id.full_name} - @${connection.from_user_id.username}</p>
+          <p>Click <a href="${process.env.FRONTEND_URL}/connections" style="color: #10b981;">here</a> to accept or reject the request</p>
+          <br/>
+          <p>Thanks,<br/>PingUp - Stay Connected</p>
+        </div>`;
+
+      // Complete the logic to send the reminder
+      await sendEmail({
+        to: connection.to_user_id.email,
+        subject: "Pending Connection Request",
+        body: `Hi ${connection.to_user_id.firstName}, you have a pending request from ${connection.from_user_id.firstName}.`
+      });
+
+      return { message: "Reminder sent" };
+    });
+
   }
 )
 
@@ -117,5 +145,6 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
 export const functions = [
   syncUserCreation,
   syncUserUpdation,
-  syncUserDeletion
+  syncUserDeletion,
+  sendNewConnectionRequestReminder
 ];
