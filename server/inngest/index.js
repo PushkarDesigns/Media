@@ -1,7 +1,8 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
-import Connection from "../models/connection.js";
+import Connection from "../models/Connection.js";
 import sendEmail from "../configs/nodeMailer.js";
+import Story from "../models/Story.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "pingup-app" });
@@ -90,6 +91,7 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
     await step.run('send-connection-request-mail', async () => {
       const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id');
 
+      
       const subject = `👋 New Connection Request`;
       const body = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -140,11 +142,32 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
   }
 )
 
+// inngest function to delete story after 24 hours
+const deleteStory = inngest.createFunction(
+    { id: 'story-delete' },
+    { event: 'app/story.delete' },
+    async ({ event, step }) => {
+        const { storyId } = event.data;
+
+        // 1. Calculate the time 24 hours from now
+        const in24Hours = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        // 2. Wait until that time
+        await step.sleepUntil('wait-for-24-hours', in24Hours);
+
+        // 3. Execute the deletion in the database
+        await step.run("delete-story", async () => {
+            return await Story.findByIdAndDelete(storyId);
+            return { message: "Story deleted." }
+        });
+    }
+);
 
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
   syncUserCreation,
   syncUserUpdation,
   syncUserDeletion,
-  sendNewConnectionRequestReminder
+  sendNewConnectionRequestReminder,
+  deleteStory
 ];

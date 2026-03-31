@@ -1,7 +1,10 @@
 import User from "../models/User.js"
 import fs from 'fs'
 import imageKit from '../configs/imageKit.js'
-import Connection from "../models/connection.js"
+import Connection from "../models/Connection.js"
+import Post from "../models/Post.js"
+import { inngest } from "../inngest/index.js"
+
 
 // Get User Data using userId
 export const getUserData = async (req, res) => {
@@ -195,10 +198,16 @@ export const sendConnectionRequest = async (req, res) => {
 
     // 3. Create the Connection Request
     if (!connection) {
-      await Connection.create({
+      const newConnection = await Connection.create({
         from_user_id: userId,
         to_user_id: id,
       })
+
+      await inngest.send({
+        name: 'app/connection-request',
+        data: {connectionId: newConnection._id}
+      })
+      
       return res.status(429).json({ success: true, message: "Connection request sent successfully" });
     } else if (connection && connection.status === 'accepted') {
       return res.status(429).json({ success: false, message: "You are already connected with this user" });
@@ -267,6 +276,37 @@ export const acceptConnectionRequest = async (req, res) => {
     // await Connection.findByIdAndDelete(connection._id);
 
     res.status(200).json({ success: true, message: "Connection accepted successfully!" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// get user profiles
+export const getUserProfiles = async (req, res) => {
+  try {
+    const { profileId } = req.body;
+
+    // 1. Find the user profile by ID
+    const profile = await User.findById(profileId);
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found"
+      });
+    }
+
+    // 2. Find all posts belonging to this user and populate user details
+    const posts = await Post.find({ user: profileId }).populate('user');
+
+    // 3. Return success response with data
+    return res.status(200).json({
+      success: true,
+      profile,
+      posts
+    });
 
   } catch (error) {
     console.error(error);
