@@ -9,7 +9,7 @@ import { inngest } from "../inngest/index.js"
 // Get User Data using userId
 export const getUserData = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const { userId } = req.auth
     const user = await User.findById(userId)
     if (!user) {
       return res.json({ success: false, message: "User not found" })
@@ -24,7 +24,7 @@ export const getUserData = async (req, res) => {
 // update user data
 export const updateUserData = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const { userId } = req.auth
     let { username, bio, location, full_name } = req.body;
 
     const tempUser = await User.findById(userId)
@@ -97,7 +97,7 @@ export const updateUserData = async (req, res) => {
 // find users using username,email, location, name
 export const discoverUsers = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const { userId } = req.auth
     const { input } = req.body;
 
     const allUsers = await User.find(
@@ -124,7 +124,7 @@ export const discoverUsers = async (req, res) => {
 // follow user
 export const followUser = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const { userId } = req.auth
     const { id } = req.body;
 
     const user = await User.findById(userId)
@@ -152,7 +152,7 @@ export const followUser = async (req, res) => {
 //  unfollow user
 export const unfollowUser = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const { userId } = req.auth
     const { id } = req.body;
 
     const user = await User.findById(userId)
@@ -174,7 +174,7 @@ export const unfollowUser = async (req, res) => {
 // send connection request
 export const sendConnectionRequest = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.body;
 
     // 1. Rate Limit Check: Max 20 requests per 24 hours
@@ -223,7 +223,7 @@ export const sendConnectionRequest = async (req, res) => {
 // get user connection
 export const getUserConnection = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     // 1. Fetch user and populate their network arrays
     const user = await User.findById(userId).populate('connections followers following');
 
@@ -248,7 +248,7 @@ export const getUserConnection = async (req, res) => {
 // accept connection request
 export const acceptConnectionRequest = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.body; // The ID of the user who sent the request
 
     // 1. Verify the connection request exists and was sent TO the current user
