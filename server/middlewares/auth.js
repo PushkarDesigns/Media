@@ -9,15 +9,18 @@
 //     res.json({success: false, message: error.message })
 //   }
 // }
+import { getAuth } from '@clerk/express'
+
 export const protect = async (req, res, next) => {
   try {
-    const { userId } = req.auth;  // ✅ function call nahi, object hai
+    const { userId } = getAuth(req)  // ✅ getAuth use karo
+    console.log('userId =>', userId)
     if (!userId) {
-      return res.json({ success: false, message: "not authenticated" });
+      return res.json({ success: false, message: "not authenticated" })
     }
-    req.userId = userId;  // ✅ aage controllers mein use kar sako
-    next();
+    req.userId = userId
+    next()
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message })
   }
 }

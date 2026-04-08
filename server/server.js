@@ -4,7 +4,7 @@ import 'dotenv/config';
 import connectDB from './configs/db.js';
 import { inngest, functions } from './inngest/index.js'
 import { serve } from 'inngest/express'
-import { clerkMiddleware } from '@clerk/express'
+import { clerkMiddleware, getAuth } from '@clerk/express'
 import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import storyRouter from './routes/storyRoutes.js';
@@ -18,7 +18,15 @@ app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware());
 
+app.use(clerkMiddleware());
 
+// Yeh add karo test ke liye
+app.get('/test-auth', (req, res) => {
+  const { userId } = getAuth(req);
+  console.log('Full auth object:', getAuth(req));
+  res.json({ userId, auth: getAuth(req) });
+});
+console.log('Key:', process.env.CLERK_SECRET_KEY)
 app.get('/', (req, res) => res.send('Server is running'));
 
 // The route from your image

@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux'
 import { fetchUser } from './features/user/userSlice.js'
 
 const App = () => {
+  
   const { user } = useUser()
   const { getToken } = useAuth()
 
