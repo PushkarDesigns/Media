@@ -20,7 +20,7 @@ app.use(clerkMiddleware());
 
 app.use(clerkMiddleware());
 
-// Yeh add karo test ke liye
+
 app.get('/test-auth', (req, res) => {
   const { userId } = getAuth(req);
   console.log('Full auth object:', getAuth(req));
