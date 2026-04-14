@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const storySchema = new mongoose.Schema({
     user: { 
-        type: String, // Standard practice: Use ObjectId for refs
+        type: String, 
         ref: 'User', 
         required: true 
     },
