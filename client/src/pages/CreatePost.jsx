@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { dummyUserData } from '../assets/assets'
+// import { dummyUserData } from '../assets/assets'
 import { Image, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from "@clerk/clerk-react";
@@ -15,38 +15,25 @@ const CreatePost = () => {
   const user = useSelector((state)=>state.user.value)
 
   const handleSubmit = async () => {
-    try {
-      setLoading(true);
+  if (!images.length && !content) {
+    return toast.error('Please add at least one image or text')
+  }
+  setLoading(true)
 
-      const token = await getToken();
+  const postType = images.length && content ? 'text_with_image' : images.length ? 'image' : 'text'
 
-      const res = await fetch(
-        "http://localhost:4000/api/user/create-post",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            content
-          })
-        }
-      );
+  try {
+    const formData = new FormData();
+    formData.append('content', content)
+    formData.append('post_type', postType)
+    images.map((image) => {
+      formData.append('images', image)
+    })
+  } catch (error) {
+    console.log(error.message);
+  }
+}
 
-      const data = await res.json();
-
-      if (data.success) {
-        setContent('');
-        setImages([]);
-      }
-
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <>
