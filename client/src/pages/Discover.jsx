@@ -1,25 +1,51 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { dummyConnectionsData } from '../assets/assets.js'
 import UserCard from '../components/UserCard.jsx'
 import Loading from '../components/Loading.jsx'
 import { Search } from 'lucide-react'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../../api/axios';
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { fetchUser } from '../features/user/userSlice.js'
 
 const Discover = () => {
 
-  const [input, setInput] = useState('')
-  const [users, setUsers] = useState(dummyConnectionsData)
-  const [loading, setLoading] = useState(false)
+  const [input, setInput] = useState('');
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { getToken } = useAuth();
+  const dispatch = useDispatch();
 
   const handleSearch = async (e) => {
     if (e.key === 'Enter') {
-      setUsers([])
-      setLoading(true)
-      setTimeout(() => {
-        setUsers(dummyConnectionsData)
+      // setUsers([])
+      // setLoading(true)
+      // setTimeout(() => {
+      //   setUsers(dummyConnectionsData)
+      //   setLoading(false)
+      // }, 1000)
+      try {
+        setUsers([])
+        setLoading(true)
+        const { data } = await api.post('/api/user/discover', { input }, {
+          headers: { Authorization: `Bearer ${await getToken()}` }
+        })
+        data.success ? setUsers(data.users) : toast.error(data.message)
         setLoading(false)
-      }, 1000)
+        setInput('')
+      } catch (error) {
+        toast.error(error.message)
+      }
+      setLoading(false)
     }
   }
+
+  useEffect(() => {
+  getToken().then((token) => {
+    dispatch(fetchUser(token))
+  })
+}, [])
 
   return (
     // Your JSX for the search bar and user list goes here
@@ -52,7 +78,7 @@ const Discover = () => {
           </div>
 
           {
-            loading && (<Loading height='60vh'/>)
+            loading && (<Loading height='60vh' />)
           }
 
         </div>

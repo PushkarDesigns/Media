@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { dummyStoriesData } from '../assets/assets';
+// import { dummyStoriesData } from '../assets/assets';
 import { Plus } from 'lucide-react';
 import moment from 'moment'
 import StoryModel from './StoryModel.jsx';
 import StoryViewer from './StoryViewer.jsx';
+import { useAuth } from '@clerk/clerk-react';
 
 const StoriesBar = () => {
+  const {getToken} = useAuth();
   const [stories, setStories] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [viewStory, setViewStory] = useState(null);
 
   const fetchStories = async () => {
     // Simulating an API call with dummy data
-    setStories(dummyStoriesData);
+    // setStories(dummyStoriesData);
   };
 
   useEffect(() => {
