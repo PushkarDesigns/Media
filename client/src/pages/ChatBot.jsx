@@ -10,7 +10,7 @@ import { addMessage, fetchMessages, resetMessages } from '../features/messages/m
 
 const ChatBox = () => {
 
-  const [messages] = useSelector((state) => state.messages) // Changed to state so it updates
+  const {messages} = useSelector((state) => state.messages) // Changed to state so it updates
   const { userId } = useParams()
   const { getToken } = useAuth()
   const dispatch = useDispatch()
@@ -19,6 +19,8 @@ const ChatBox = () => {
   const [image, setImage] = useState(null)
   const [user, setUser] = useState(null)
   const messagesEndRef = useRef(null)
+
+  const connections = useSelector((state) => state.connections.connections)
 
   const fetchUserMessages = async () => {
     try {
@@ -30,12 +32,19 @@ const ChatBox = () => {
   }
 
   useEffect(() => {
-  fetchUserMessages()
+    fetchUserMessages()
 
-  return () => {
-    dispatch(resetMessages())
-  }
-}, [userId])
+    return () => {
+      dispatch(resetMessages())
+    }
+  }, [userId])
+
+  useEffect(() => {
+    if (connections.length > 0) {
+      const user = connections.find(connection => connection._id === userId)
+      setUser(user)
+    }
+  }, [connections, userId])
 
 
   // Automatically scroll to bottom when messages update
