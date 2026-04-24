@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import Feed from './pages/Feed.jsx'
 import Messages from './pages/Messages.jsx'
@@ -10,19 +10,23 @@ import Profile from './pages/Profile.jsx'
 import CreatePost from './pages/CreatePost.jsx'
 import { useUser, useAuth } from '@clerk/clerk-react'
 import Layout from './pages/Layout.jsx'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { fetchUser } from './features/user/userSlice.js'
 import { fetchConnections } from './features/connections/connectionsSlice.js'
+import { addMessage } from './features/messages/messagesSlice.js'
+import Notification from './components/Notification.jsx'
 
 const App = () => {
-  
+
   const { user } = useUser()
   const { getToken } = useAuth()
+  const { pathname } = useLocation()
+  const pathnameRef = useRef(pathname)
 
   const dispatch = useDispatch()
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       if (user) {
         const token = await getToken();
@@ -34,6 +38,32 @@ const App = () => {
 
     fetchData();
   }, [user, getToken, dispatch]);
+
+  useEffect(() => {
+    pathnameRef.current = pathname
+  }, [pathname])
+
+  useEffect(() => {
+    if (user) {
+      const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user.id);
+
+      eventSource.onmessage = (event) => {
+        const message = JSON.parse(event.data)
+
+        if (pathnameRef.current === ('/messages/' + message.from_user_id._id)) {
+          dispatch(addMessage(message))
+        } else {
+          toast.custom((t) => (
+            <Notification t={t} message={message} />
+          ), { position: "bottom-right" })
+        }
+      }
+      return () => {
+        eventSource.close()
+      }
+    }
+  }, [user, dispatch])
+
 
   return (
     <>
