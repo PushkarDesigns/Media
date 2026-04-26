@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Users, UserPlus, UserCheck, UserRoundPen, MessageSquare } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
-import api from '../../api/axios';
+import api from '../api/axios';
 // import {
 //   dummyConnectionsData as connections,
 //   dummyFollowersData as followers,
@@ -11,7 +11,7 @@ import api from '../../api/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '@clerk/clerk-react';
 import toast from 'react-hot-toast';
-import { fetchConnections } from './features/connections/connectionsSlice.js'
+import { fetchConnections } from '../features/connections/connectionsSlice.js'
 
 const Connections = () => {
   const [currentTab, setCurrentTab] = useState('Followers');

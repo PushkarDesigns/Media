@@ -4,7 +4,7 @@ import { ImageIcon, SendHorizontal } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
-import api from '../../api/axios';
+import api from '../api/axios';
 import toast from 'react-hot-toast'
 import { addMessage, fetchMessages, resetMessages } from '../features/messages/messagesSlice'
 

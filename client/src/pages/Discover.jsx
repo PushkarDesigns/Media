@@ -4,7 +4,7 @@ import UserCard from '../components/UserCard.jsx'
 import Loading from '../components/Loading.jsx'
 import { Search } from 'lucide-react'
 import { useAuth } from '@clerk/clerk-react'
-import api from '../../api/axios';
+import api from '../api/axios';
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { fetchUser } from '../features/user/userSlice.js'
