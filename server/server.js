@@ -32,9 +32,6 @@ app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware());
 
-app.use(clerkMiddleware());
-
-
 app.get('/test-auth', (req, res) => {
   const { userId } = getAuth(req);
   console.log('Full auth object:', getAuth(req));

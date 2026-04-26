@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { dummyConnectionsData } from '../assets/assets.js'
+// import { dummyConnectionsData } from '../assets/assets.js'
 import UserCard from '../components/UserCard.jsx'
 import Loading from '../components/Loading.jsx'
 import { Search } from 'lucide-react'
