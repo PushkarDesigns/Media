@@ -10,18 +10,7 @@ import postRouter from './routes/postRoutes.js';
 import storyRouter from './routes/storyRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
 
-const app = express();
-
-// Connect DB inside handler (important for Vercel)
-let isConnected = false;
-
-async function initDB() {
-  if (!isConnected) {
-    await connectDB();
-    isConnected = true;
-    console.log("DB connected");
-  }
-}
+await connectDB();
 
 app.use(async (req, res, next) => {
   await initDB();
@@ -48,17 +37,10 @@ app.use('/api/post', postRouter)
 app.use('/api/story', storyRouter)
 app.use('/api/message', messageRouter)
 
-// const PORT = process.env.PORT || 4000;
-
-// app.listen(PORT, () => {
-//   console.log(`Example app listening at http://localhost:${PORT}`)
-// })
-
 const PORT = process.env.PORT || 4000;
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`Example app listening at http://localhost:${PORT}`)
+})
+
 export default app; 
