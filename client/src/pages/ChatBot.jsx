@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react'
-// import { dummyMessagesData, dummyUserData } from '../assets/assets'
 import { ImageIcon, SendHorizontal } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
