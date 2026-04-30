@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar.jsx'
 import { Outlet } from 'react-router-dom'
 import { Menu, X } from 'lucide-react';
-// import { dummyUserData } from '../assets/assets.js';
 import Loading from '../components/Loading.jsx';
 import { useSelector } from 'react-redux';
 
