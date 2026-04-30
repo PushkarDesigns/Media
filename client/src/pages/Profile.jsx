@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { dummyPostsData, dummyUserData } from '../assets/assets.js'
 import Loading from '../components/Loading.jsx'
 import UserProfileInfo from '../components/UserProfileInfo.jsx'
 import moment from 'moment'
